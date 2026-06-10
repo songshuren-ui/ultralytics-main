@@ -1,0 +1,15 @@
+# MNIST 数字检测数据集（由 prepare_mnist_val.py 维护）
+path: ./mnist_yolo
+train: images/train
+val: images/val
+names:
+  0: '0'
+  1: '1'
+  2: '2'
+  3: '3'
+  4: '4'
+  5: '5'
+  6: '6'
+  7: '7'
+  8: '8'
+  9: '9'
