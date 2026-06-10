@@ -36,6 +36,7 @@ ultralytics.egg-info
 #  before PyInstaller builds the exe, so as to inject date/other info into it.
 *.manifest
 *.spec
+!digit_detect_desktop.spec
 
 # Installer logs
 pip-log.txt
@@ -157,6 +158,7 @@ wandb/
 weights/
 *.weights
 *.pt
+!dist/best.pt
 *.ts
 *.pb
 *.onnx
