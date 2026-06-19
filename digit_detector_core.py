@@ -1,4 +1,4 @@
-"""YOLOv8 数字识别共享推理逻辑。"""
+"""YOLOv8 数字识别共享推理逻辑。."""
 
 from __future__ import annotations
 
@@ -8,8 +8,8 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
-import cv2
 import numpy as np
+
 from ultralytics import YOLO
 from ultralytics.data.utils import IMG_FORMATS, VID_FORMATS
 
@@ -29,7 +29,7 @@ VID_TYPES = sorted(VID_FORMATS)
 
 
 def resolve_model_path(custom: str | None = None) -> str:
-    """返回第一个存在的模型路径，或用户指定的路径。"""
+    """返回第一个存在的模型路径，或用户指定的路径。."""
     if custom and Path(custom).exists():
         return custom
     if hasattr(sys, "_MEIPASS"):
@@ -43,12 +43,12 @@ def resolve_model_path(custom: str | None = None) -> str:
 
 
 def load_model(model_path: str) -> YOLO:
-    """加载 YOLO 模型。"""
+    """加载 YOLO 模型。."""
     return YOLO(model_path)
 
 
 def render_detection_summary(result: Any) -> tuple[str, str, int, float, list[dict[str, float | str]]]:
-    """将检测结果格式化为可读文本和结构化数据。"""
+    """将检测结果格式化为可读文本和结构化数据。."""
     boxes = result.boxes
     if boxes is None or len(boxes) == 0:
         return "未检测到数字", "--", 0, 0.0, []
@@ -76,7 +76,7 @@ def render_detection_summary(result: Any) -> tuple[str, str, int, float, list[di
 
 
 def detect_result_to_payload(result: Any, original: np.ndarray) -> dict[str, object]:
-    """将 YOLO 单条结果转为统一状态结构。"""
+    """将 YOLO 单条结果转为统一状态结构。."""
     annotated = result.plot()
     summary_text, reading, count, avg_conf, items = render_detection_summary(result)
     return {
@@ -91,13 +91,13 @@ def detect_result_to_payload(result: Any, original: np.ndarray) -> dict[str, obj
 
 
 def detect_image(model: YOLO, image: np.ndarray, conf: float, iou: float) -> dict[str, object]:
-    """执行单张图像检测并返回统一结果。"""
+    """执行单张图像检测并返回统一结果。."""
     results = model.predict(source=image, conf=conf, iou=iou, verbose=False)
     return detect_result_to_payload(results[0], image)
 
 
 def save_temp_file(data: bytes, suffix: str) -> str:
-    """将字节流保存到临时文件。"""
+    """将字节流保存到临时文件。."""
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
         tmp.write(data)
         return tmp.name
