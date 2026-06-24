@@ -1,4 +1,4 @@
-"""从 MNIST YOLO 训练集中划分验证集，并更新 mnist.yaml。"""
+"""从 MNIST YOLO 训练集中划分验证集，并更新 mnist.yaml。."""
 
 from __future__ import annotations
 
@@ -47,7 +47,7 @@ def split_mnist() -> tuple[int, int]:
 
 def update_yaml(train_count: int, val_count: int) -> None:
     yaml_path = ROOT / "mnist.yaml"
-    content = f"""# MNIST 数字检测数据集（由 prepare_mnist_val.py 维护）
+    content = """# MNIST 数字检测数据集（由 prepare_mnist_val.py 维护）
 path: ./mnist_yolo
 train: images/train
 val: images/val
