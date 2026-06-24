@@ -1,4 +1,4 @@
-"""对真实数字检测数据集进行离线扩增，生成更丰富的小样本训练集。"""
+"""对真实数字检测数据集进行离线扩增，生成更丰富的小样本训练集。."""
 
 from __future__ import annotations
 
@@ -107,7 +107,9 @@ def transform_boxes(boxes: list[list[float]], matrix: np.ndarray, width: int, he
     return transformed
 
 
-def augment_image(image: np.ndarray, boxes: list[list[float]], rng: random.Random) -> tuple[np.ndarray, list[list[float]]]:
+def augment_image(
+    image: np.ndarray, boxes: list[list[float]], rng: random.Random
+) -> tuple[np.ndarray, list[list[float]]]:
     height, width = image.shape[:2]
     angle = rng.uniform(-4.0, 4.0)
     scale = rng.uniform(0.92, 1.08)

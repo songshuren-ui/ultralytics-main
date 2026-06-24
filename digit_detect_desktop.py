@@ -1,4 +1,4 @@
-"""YOLOv8 数字识别桌面端。"""
+"""YOLOv8 数字识别桌面端。."""
 
 from __future__ import annotations
 
@@ -10,21 +10,21 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-from PySide6.QtCore import QThread, Qt, Signal
+from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtGui import QImage, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
-    QFileDialog,
     QDoubleSpinBox,
+    QFileDialog,
     QGridLayout,
     QGroupBox,
     QHBoxLayout,
     QLabel,
     QMainWindow,
     QMessageBox,
-    QPushButton,
     QPlainTextEdit,
     QProgressBar,
+    QPushButton,
     QSplitter,
     QVBoxLayout,
     QWidget,
@@ -63,10 +63,12 @@ class BatchWorker(QThread):
                     out_path = os.path.join(temp_dir, out_name)
                     cv2.imencode(".jpg", payload["annotated"])[1].tofile(out_path)
                     archive.write(out_path, arcname=out_name)
-                    rows.append({
-                        "path": path,
-                        "payload": payload,
-                    })
+                    rows.append(
+                        {
+                            "path": path,
+                            "payload": payload,
+                        }
+                    )
             self.finished_ok.emit(rows, zip_path)
         except Exception as exc:
             self.failed.emit(str(exc))
@@ -100,7 +102,7 @@ class VideoWorker(QThread):
             if not results:
                 raise RuntimeError("视频未产出任何检测结果")
 
-            result = results[0]
+            results[0]
             capture = cv2.VideoCapture(self.video_path)
             frames = int(capture.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
             middle = max(frames // 2, 0)
@@ -425,6 +427,7 @@ class MainWindow(QMainWindow):
         if not path:
             return
         import shutil
+
         shutil.copy2(self.last_export_path, path)
         self.status_label.setText(f"已导出文件：{path}")
 

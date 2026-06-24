@@ -1,4 +1,4 @@
-"""YOLOv8 数字识别检测应用 — 桌面软件风格工作台，支持拍照、图片、批量图片与视频检测。"""
+"""YOLOv8 数字识别检测应用 — 桌面软件风格工作台，支持拍照、图片、批量图片与视频检测。."""
 
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 import streamlit as st
+
 from ultralytics import YOLO
 from ultralytics.data.utils import IMG_FORMATS, VID_FORMATS
 
@@ -32,7 +33,7 @@ VID_TYPES = sorted(VID_FORMATS)
 
 
 def resolve_model_path(custom: str | None = None) -> str:
-    """返回第一个存在的模型路径，或用户指定的路径。"""
+    """返回第一个存在的模型路径，或用户指定的路径。."""
     if custom and Path(custom).exists():
         return custom
     if hasattr(sys, "_MEIPASS"):
@@ -51,7 +52,7 @@ def load_model(model_path: str) -> YOLO:
 
 
 def render_detection_summary(result) -> tuple[str, str, int, float, list[dict[str, float | str]]]:
-    """将检测结果格式化为可读文本和结构化数据。"""
+    """将检测结果格式化为可读文本和结构化数据。."""
     boxes = result.boxes
     if boxes is None or len(boxes) == 0:
         return "未检测到数字", "--", 0, 0.0, []
@@ -79,14 +80,14 @@ def render_detection_summary(result) -> tuple[str, str, int, float, list[dict[st
 
 
 def save_uploaded_file(uploaded, suffix: str) -> str:
-    """将 Streamlit 上传文件保存到临时路径并返回路径。"""
+    """将 Streamlit 上传文件保存到临时路径并返回路径。."""
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
         tmp.write(uploaded.getbuffer())
         return tmp.name
 
 
 def image_to_data_url(image: np.ndarray) -> str:
-    """将 OpenCV 图像转为 data URL 供 HTML 预览。"""
+    """将 OpenCV 图像转为 data URL 供 HTML 预览。."""
     ok, buf = cv2.imencode(".jpg", image)
     if not ok:
         return ""
@@ -95,7 +96,7 @@ def image_to_data_url(image: np.ndarray) -> str:
 
 
 def detect_result_to_payload(result, original: np.ndarray) -> dict[str, object]:
-    """将 YOLO 单条结果转为统一状态结构。"""
+    """将 YOLO 单条结果转为统一状态结构。."""
     annotated = result.plot()
     summary_text, reading, count, avg_conf, items = render_detection_summary(result)
     return {
@@ -110,14 +111,14 @@ def detect_result_to_payload(result, original: np.ndarray) -> dict[str, object]:
 
 
 def detect_image(model: YOLO, image: np.ndarray, conf: float, iou: float) -> dict[str, object]:
-    """执行单张图像检测并返回统一结果。"""
+    """执行单张图像检测并返回统一结果。."""
     results = model.predict(source=image, conf=conf, iou=iou, verbose=False)
     result = results[0]
     return detect_result_to_payload(result, image)
 
 
 def init_state() -> None:
-    """初始化页面状态。"""
+    """初始化页面状态。."""
     defaults = {
         "last_result": None,
         "last_mode": "拍照识别",
@@ -133,7 +134,7 @@ def init_state() -> None:
 
 
 def save_camera_snapshot(image: np.ndarray) -> tuple[str, str]:
-    """保存摄像头抓拍原图并返回路径与文件名。"""
+    """保存摄像头抓拍原图并返回路径与文件名。."""
     save_dir = Path.cwd() / "captures"
     save_dir.mkdir(parents=True, exist_ok=True)
     timestamp = __import__("datetime").datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -146,7 +147,7 @@ def save_camera_snapshot(image: np.ndarray) -> tuple[str, str]:
 
 
 def grab_camera_frame(camera_index: int = 0) -> np.ndarray | None:
-    """从本地摄像头读取一帧。"""
+    """从本地摄像头读取一帧。."""
     cap = cv2.VideoCapture(camera_index, cv2.CAP_DSHOW)
     if not cap.isOpened():
         cap = cv2.VideoCapture(camera_index)
@@ -165,7 +166,7 @@ def grab_camera_frame(camera_index: int = 0) -> np.ndarray | None:
 
 
 def inject_theme() -> None:
-    """注入桌面软件风格主题。"""
+    """注入桌面软件风格主题。."""
     st.markdown(
         """
         <style>
@@ -486,7 +487,7 @@ def inject_theme() -> None:
 
 
 def render_header(model_path: str) -> None:
-    """渲染顶部品牌区。"""
+    """渲染顶部品牌区。."""
     st.markdown(
         f"""
         <section class="hero-shell">
@@ -506,7 +507,7 @@ def render_header(model_path: str) -> None:
 
 
 def render_metrics(model_path: str, class_names: str) -> None:
-    """渲染概览指标。"""
+    """渲染概览指标。."""
     col1, col2, col3 = st.columns(3)
     with col1:
         st.markdown(
@@ -534,7 +535,7 @@ def render_metrics(model_path: str, class_names: str) -> None:
             f"""
             <div class="metric-card">
               <div class="metric-label">检测类别</div>
-              <div class="metric-value">{len(class_names.split(', '))} 类</div>
+              <div class="metric-value">{len(class_names.split(", "))} 类</div>
               <div class="metric-sub">{class_names}</div>
             </div>
             """,
@@ -543,12 +544,12 @@ def render_metrics(model_path: str, class_names: str) -> None:
 
 
 def render_workspace_intro() -> None:
-    """入口区已精简，不再渲染额外卡片。"""
+    """入口区已精简，不再渲染额外卡片。."""
     return
 
 
 def render_result_dashboard() -> None:
-    """渲染最近一次识别结果。"""
+    """渲染最近一次识别结果。."""
     result = st.session_state.get("last_result")
     if not result:
         st.markdown(
@@ -569,12 +570,14 @@ def render_result_dashboard() -> None:
         with col1:
             st.markdown('<div class="preview-frame"><div class="preview-label">原始画面</div>', unsafe_allow_html=True)
             st.image(result["original"], channels="BGR", use_container_width=True)
-            st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
         with col2:
-            st.markdown('<div class="preview-frame"><div class="preview-label">YOLOv8 标注结果</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="preview-frame"><div class="preview-label">YOLOv8 标注结果</div>', unsafe_allow_html=True
+            )
             st.image(result["annotated"], channels="BGR", use_container_width=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
     with right:
         reading = result["reading"] or "--"
@@ -607,13 +610,13 @@ def render_result_dashboard() -> None:
                     f"""
                     <div class="detail-item">
                       <div style="display:flex; align-items:center; gap:12px;">
-                        <span class="digit-pill">{item['label']}</span>
+                        <span class="digit-pill">{item["label"]}</span>
                         <div>
-                          <div style="color:#ecfffb; font-weight:600;">数字 {item['label']}</div>
+                          <div style="color:#ecfffb; font-weight:600;">数字 {item["label"]}</div>
                           <div style="color:#9ec8c1; font-size:0.84rem;">来自左到右排序后的检测框</div>
                         </div>
                       </div>
-                      <div style="color:#dffef5; font-weight:600;">{float(item['confidence']):.2%}</div>
+                      <div style="color:#dffef5; font-weight:600;">{float(item["confidence"]):.2%}</div>
                     </div>
                     """,
                     unsafe_allow_html=True,
@@ -635,7 +638,7 @@ def render_result_dashboard() -> None:
 
 
 def update_last_result(mode: str, result: dict[str, object]) -> None:
-    """写入最近一次识别结果。"""
+    """写入最近一次识别结果。."""
     st.session_state["last_mode"] = mode
     st.session_state["last_result"] = result
 
@@ -856,7 +859,9 @@ def run_video_detection(model: YOLO, conf: float, iou: float) -> None:
                         "items": items,
                     },
                 )
-                st.image(preview_frame, channels="BGR", caption=f"中间帧预览（第 {mid + 1} 帧）", use_container_width=True)
+                st.image(
+                    preview_frame, channels="BGR", caption=f"中间帧预览（第 {mid + 1} 帧）", use_container_width=True
+                )
 
             with open(out_video, "rb") as file:
                 st.download_button(
