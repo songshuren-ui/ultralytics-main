@@ -1,4 +1,4 @@
-"""将 digit_dataset 划分为 train/val，并生成 num.yaml 配置文件。"""
+"""将 digit_dataset 划分为 train/val，并生成 num.yaml 配置文件。."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ NAMES = {i: str(i) for i in range(10)}
 
 
 def _is_flat_layout() -> bool:
-    """images/ 根目录下仍有图片文件时视为未划分。"""
+    """images/ 根目录下仍有图片文件时视为未划分。."""
     images_dir = DATASET / "images"
     if not images_dir.exists():
         return False
@@ -29,7 +29,7 @@ def _image_files(directory: Path) -> list[Path]:
 
 
 def split_dataset() -> tuple[int, int]:
-    """将扁平 images/labels 移动到 train/val 子目录。"""
+    """将扁平 images/labels 移动到 train/val 子目录。."""
     images_dir = DATASET / "images"
     labels_dir = DATASET / "labels"
 
@@ -61,7 +61,7 @@ def split_dataset() -> tuple[int, int]:
 
 
 def collect_dataset_stats() -> dict[str, object]:
-    """汇总图片数、标签数、类别分布和缺失标签。"""
+    """汇总图片数、标签数、类别分布和缺失标签。."""
     image_root = DATASET / "images"
     label_root = DATASET / "labels"
 
@@ -102,7 +102,7 @@ def collect_dataset_stats() -> dict[str, object]:
 
 
 def print_dataset_report(stats: dict[str, object]) -> None:
-    """输出数据集摘要，并对小数据集给出告警。"""
+    """输出数据集摘要，并对小数据集给出告警。."""
     images = stats["images"]
     labels = stats["labels"]
     boxes = stats["boxes"]
