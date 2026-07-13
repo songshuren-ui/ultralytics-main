@@ -14,7 +14,7 @@ hiddenimports = [
     "PySide6.QtWidgets",
 ]
 binaries = collect_dynamic_libs("PySide6")
-datas = collect_data_files("PySide6") + [
+data = collect_data_files("PySide6") + [
     (str(root / 'dist' / 'best.pt'), '.'),
 ]
 
@@ -23,7 +23,7 @@ a = Analysis(
     ['digit_detect_desktop.py'],
     pathex=[str(root)],
     binaries=binaries,
-    datas=datas,
+    data=data,
     hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
@@ -38,7 +38,7 @@ exe = EXE(
     pyz,
     a.scripts,
     a.binaries,
-    a.datas,
+    a.data,
     [],
     name='digit_detect_desktop',
     debug=False,
