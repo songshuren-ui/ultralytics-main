@@ -1,4 +1,4 @@
-"""YOLOv8 数字识别优化训练脚本 — 两阶段：MNIST 预训练 + 水表数字微调。"""
+"""YOLOv8 数字识别优化训练脚本 — 两阶段：MNIST 预训练 + 水表数字微调。."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 import torch
+
 from ultralytics import YOLO
 
 ROOT = Path(__file__).parent
@@ -138,7 +139,7 @@ DIGIT_FULL_KWARGS = dict(
 
 
 def resolve_device(device: str) -> str:
-    """解析训练设备，支持 auto/cpu/cuda/0 等写法。"""
+    """解析训练设备，支持 auto/cpu/cuda/0 等写法。."""
     normalized = device.strip().lower()
     if normalized == "auto":
         return "0" if torch.cuda.is_available() else "cpu"
@@ -177,7 +178,7 @@ def prepare_datasets(
     digit_boost_classes: list[int] | None = None,
     digit_boost_copies: int = 2,
 ) -> None:
-    """运行数据集准备脚本。"""
+    """运行数据集准备脚本。."""
     from augment_digit_dataset import main as build_digit_aug
     from augment_mnist_style import main as build_mnist_style
     from prepare_digit_dataset import main as prep_digit
@@ -208,11 +209,7 @@ def prepare_datasets(
                 str(digit_aug_copies),
                 "--boost-copies",
                 str(digit_boost_copies),
-                *[
-                    arg
-                    for class_id in (digit_boost_classes or [])
-                    for arg in ("--boost-class", str(class_id))
-                ],
+                *[arg for class_id in (digit_boost_classes or []) for arg in ("--boost-class", str(class_id))],
             ]
             build_digit_aug()
         finally:
@@ -220,11 +217,13 @@ def prepare_datasets(
 
 
 def train_mnist(model_path: Path | None = None, data_yaml: Path | None = None, device: str = "auto") -> Path:
-    """阶段 1：MNIST 预训练。"""
+    """阶段 1：MNIST 预训练。."""
     weights = model_path or find_checkpoint([ROOT / DEFAULT_MODEL, ROOT / "yolov8n.pt"])
     resolved_device = resolve_device(device)
     train_kwargs = {**MNIST_TRAIN_KWARGS, "data": str(data_yaml or MNIST_YAML), "device": resolved_device}
-    print(f"\n{'=' * 60}\n阶段 1: MNIST 预训练\n模型: {weights}\n数据集: {train_kwargs['data']}\n设备: {resolved_device}\n{'=' * 60}")
+    print(
+        f"\n{'=' * 60}\n阶段 1: MNIST 预训练\n模型: {weights}\n数据集: {train_kwargs['data']}\n设备: {resolved_device}\n{'=' * 60}"
+    )
     model = YOLO(str(weights))
     model.train(**train_kwargs)
     best = ROOT / "runs/detect/mnist_pretrain/weights/best.pt"
@@ -233,14 +232,16 @@ def train_mnist(model_path: Path | None = None, data_yaml: Path | None = None, d
 
 
 def train_digit_finetune(base_weights: Path, data_yaml: Path | None = None, device: str = "auto") -> Path:
-    """阶段 2a：冻结骨干微调。"""
+    """阶段 2a：冻结骨干微调。."""
     selected_yaml = data_yaml or DIGIT_YAML
     if not selected_yaml.exists():
         raise FileNotFoundError(f"缺少 {selected_yaml}，请先准备对应数据集")
 
     resolved_device = resolve_device(device)
     train_kwargs = {**DIGIT_FREEZE_KWARGS, "data": str(selected_yaml), "device": resolved_device}
-    print(f"\n{'=' * 60}\n阶段 2a: 水表数字微调（冻结骨干）\n基础模型: {base_weights}\n数据集: {train_kwargs['data']}\n设备: {resolved_device}\n{'=' * 60}")
+    print(
+        f"\n{'=' * 60}\n阶段 2a: 水表数字微调（冻结骨干）\n基础模型: {base_weights}\n数据集: {train_kwargs['data']}\n设备: {resolved_device}\n{'=' * 60}"
+    )
     model = YOLO(str(base_weights))
     model.train(**train_kwargs)
     best = ROOT / "runs/detect/digit_finetune/weights/best.pt"
@@ -249,10 +250,12 @@ def train_digit_finetune(base_weights: Path, data_yaml: Path | None = None, devi
 
 
 def train_digit_full(base_weights: Path, data_yaml: Path | None = None, device: str = "auto") -> Path:
-    """阶段 2b：解冻全网络精调。"""
+    """阶段 2b：解冻全网络精调。."""
     resolved_device = resolve_device(device)
     train_kwargs = {**DIGIT_FULL_KWARGS, "data": str(data_yaml or DIGIT_YAML), "device": resolved_device}
-    print(f"\n{'=' * 60}\n阶段 2b: 全网络精调（低学习率）\n基础模型: {base_weights}\n数据集: {train_kwargs['data']}\n设备: {resolved_device}\n{'=' * 60}")
+    print(
+        f"\n{'=' * 60}\n阶段 2b: 全网络精调（低学习率）\n基础模型: {base_weights}\n数据集: {train_kwargs['data']}\n设备: {resolved_device}\n{'=' * 60}"
+    )
     model = YOLO(str(base_weights))
     model.train(**train_kwargs)
     best = ROOT / "runs/detect/digit_finetune_full/weights/best.pt"
@@ -261,7 +264,7 @@ def train_digit_full(base_weights: Path, data_yaml: Path | None = None, device: 
 
 
 def train_digit_fast_smoke(base_weights: Path, data_yaml: Path | None = None, device: str = "auto") -> Path:
-    """快速验证增强是否有效，优先缩短 CPU 训练时间。"""
+    """快速验证增强是否有效，优先缩短 CPU 训练时间。."""
     selected_yaml = data_yaml or DIGIT_YAML
     if not selected_yaml.exists():
         raise FileNotFoundError(f"缺少 {selected_yaml}，请先准备对应数据集")
@@ -285,7 +288,9 @@ def train_digit_fast_smoke(base_weights: Path, data_yaml: Path | None = None, de
         "shear": 0.0,
         "name": "digit_finetune_fast_smoke",
     }
-    print(f"\n{'=' * 60}\n快速验证: 水表数字短训\n基础模型: {base_weights}\n数据集: {train_kwargs['data']}\n设备: {resolved_device}\n{'=' * 60}")
+    print(
+        f"\n{'=' * 60}\n快速验证: 水表数字短训\n基础模型: {base_weights}\n数据集: {train_kwargs['data']}\n设备: {resolved_device}\n{'=' * 60}"
+    )
     model = YOLO(str(base_weights))
     model.train(**train_kwargs)
     best = ROOT / "runs/detect/digit_finetune_fast_smoke/weights/best.pt"
@@ -294,7 +299,7 @@ def train_digit_fast_smoke(base_weights: Path, data_yaml: Path | None = None, de
 
 
 def deploy_model(best_pt: Path, target: Path | None = None) -> Path:
-    """将最佳权重复制到 dist/best.pt 供检测应用使用。"""
+    """将最佳权重复制到 dist/best.pt 供检测应用使用。."""
     target = target or ROOT / "dist/best.pt"
     target.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(best_pt, target)
@@ -328,7 +333,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--build-augmented-digit", action="store_true", help="生成增强后的真实数字数据集")
     parser.add_argument("--mnist-style-copies", type=int, default=1, help="每张 MNIST 原图生成多少张风格增强图")
     parser.add_argument("--digit-aug-copies", type=int, default=3, help="每张真实训练图生成多少张增强图")
-    parser.add_argument("--digit-boost-class", type=int, action="append", default=[1, 2, 4, 6, 7], help="对包含指定类别的训练图追加增强，可多次传入；默认补强弱识别数字")
+    parser.add_argument(
+        "--digit-boost-class",
+        type=int,
+        action="append",
+        default=[1, 2, 4, 6, 7],
+        help="对包含指定类别的训练图追加增强，可多次传入；默认补强弱识别数字",
+    )
     parser.add_argument("--digit-boost-copies", type=int, default=2, help="命中 boost 类别的训练图额外生成多少张增强图")
     parser.add_argument("--deploy", action="store_true", default=True, help="训练完成后复制到 dist/best.pt")
     parser.add_argument("--no-deploy", action="store_false", dest="deploy", help="不自动部署")
@@ -368,8 +379,14 @@ def main() -> None:
         if args.stage == "digit":
             base = Path(args.mnist_weights) if args.mnist_weights else find_checkpoint(DIGIT_BASE_CHECKPOINTS)
         else:
-            base = final_best or find_checkpoint([ROOT / "runs/detect/mnist_pretrain/weights/best.pt", *MNIST_CHECKPOINTS])
-        final_best = train_digit_fast_smoke(base, selected_digit_yaml, args.device) if args.fast_smoke else train_digit_finetune(base, selected_digit_yaml, args.device)
+            base = final_best or find_checkpoint(
+                [ROOT / "runs/detect/mnist_pretrain/weights/best.pt", *MNIST_CHECKPOINTS]
+            )
+        final_best = (
+            train_digit_fast_smoke(base, selected_digit_yaml, args.device)
+            if args.fast_smoke
+            else train_digit_finetune(base, selected_digit_yaml, args.device)
+        )
 
         if args.full and not args.fast_smoke:
             final_best = train_digit_full(final_best, selected_digit_yaml, args.device)

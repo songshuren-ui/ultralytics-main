@@ -1,4 +1,4 @@
-"""生成更接近真实拍照场景的 MNIST YOLO 预训练数据。"""
+"""生成更接近真实拍照场景的 MNIST YOLO 预训练数据。."""
 
 from __future__ import annotations
 

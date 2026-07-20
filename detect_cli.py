@@ -1,4 +1,4 @@
-"""命令行检测工具 — 支持单图、批量图片、视频与摄像头。"""
+"""命令行检测工具 — 支持单图、批量图片、视频与摄像头。."""
 
 from __future__ import annotations
 
@@ -25,9 +25,7 @@ def resolve_model_path(custom: str | None) -> str:
     for candidate in MODEL_CANDIDATES:
         if Path(candidate).exists():
             return candidate
-    raise FileNotFoundError(
-        f"未找到模型文件，请通过 --model 指定路径。已尝试: {', '.join(MODEL_CANDIDATES)}"
-    )
+    raise FileNotFoundError(f"未找到模型文件，请通过 --model 指定路径。已尝试: {', '.join(MODEL_CANDIDATES)}")
 
 
 def parse_args() -> argparse.Namespace:
